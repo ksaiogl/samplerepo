@@ -79,24 +79,16 @@ passport.serializeUser(function(user, done) {
   done(null, user.id);
 });
 
-passport.deserializeUser(function(id, done) {
-  User.getUserById(id, function(err, user) {
-    done(err, user);
-  });
+// Get Homepage
+router.get('/', ensureAuthenticated, function(req, res){
+	res.render('index');
 });
 
-router.post('/login',
-  passport.authenticate('local', {successRedirect:'/', failureRedirect:'/users/login',failureFlash: true}),
-  function(req, res) {
-    res.redirect('/');
-  });
-
-router.get('/logout', function(req, res){
-	req.logout();
-
-	req.flash('success_msg', 'You are logged out');
-
-	res.redirect('/users/login');
-});
-
-module.exports = router;
+function ensureAuthenticated(req, res, next){
+	if(req.isAuthenticated()){
+		return next();
+	} else {
+		//req.flash('error_msg','You are not logged in');
+		res.redirect('/users/login');
+	}
+}
